@@ -60,8 +60,7 @@ def handle(m):
 
     if state == 'ASK_BANK_BTN' and text.startswith("✅"):
         user_state[cid] = 'ASK_BANK'
-        bot.send_message(cid, "Enter bank details like:
-A/C, IFSC, Bank Name")
+        bot.send_message(cid, "Enter bank details like:\nA/C, IFSC, Bank Name")
         return
 
     if state == 'ASK_BANK':
@@ -80,8 +79,7 @@ A/C, IFSC, Bank Name")
             user_data.setdefault(cid, {})['balance'] = credited_amount
             user_data[cid]['referrals'] = user_data[cid].get('referrals', 0)
             bot.send_message(cid, f"🎉 ₹{credited_amount} successfully credited to your wallet!")
-            bot.send_message(cid, f"🔗 Your referral link:
-https://t.me/Task_Youtube_Bot?start={cid}")
+            bot.send_message(cid, f"🔗 Your referral link:\nhttps://t.me/Task_Youtube_Bot?start={cid}")
             kb = types.ReplyKeyboardMarkup(resize_keyboard=True)
             kb.add("💼 Withdraw")
             bot.send_message(cid, "👇 Tap below to withdraw your salary:", reply_markup=kb)
@@ -91,12 +89,13 @@ https://t.me/Task_Youtube_Bot?start={cid}")
         return
 
     if text == "💼 Withdraw":
-        bot.send_message(cid, "💳 This is the final and last merchant task.
-You need to pay ₹11 to UPI ID:
-`9062435123@okbizaxis`
-and send the screenshot.
-
-📌 QR Code:", parse_mode='Markdown')
+        bot.send_message(
+            cid,
+            "💳 This is the final and last merchant task.\n"
+            "You need to pay ₹11 to UPI ID:\n`9062435123@okbizaxis`\n"
+            "and send the screenshot.\n\n📌 QR Code:",
+            parse_mode='Markdown'
+        )
         bot.send_photo(cid, "https://i.ibb.co/VYHmccgW/qr.jpg")
         user_state[cid] = 'WAIT_SCREENSHOT'
         return
