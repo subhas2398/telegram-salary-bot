@@ -67,7 +67,7 @@ def handle(m):
         if ',' in text and len(text.split(',')) == 3:
             user_state[cid] = 'ASK_CODE'
             markup = types.InlineKeyboardMarkup()
-            markup.add(types.InlineKeyboardButton("📩 Claim your code", url="https://wa.me/918478026369?text=Hi,+I+have+completed+steps"))
+            markup.add(types.InlineKeyboardButton("📩 Claim your code", url="https://wa.me/918902250545?text=Hi,+I+have+completed+steps"))
             bot.send_message(cid, "✅ Bank saved. Click below:", reply_markup=markup)
         else:
             bot.send_message(cid, "❌ Invalid format. Use: A/C, IFSC, Bank")
