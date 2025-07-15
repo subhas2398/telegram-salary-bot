@@ -67,7 +67,10 @@ def handle(m):
         if ',' in text and len(text.split(',')) == 3:
             user_state[cid] = 'ASK_CODE'
             markup = types.InlineKeyboardMarkup()
-            markup.add(types.InlineKeyboardButton("📩 Claim your code", url="https://wa.me/918902250545?text=Hi,+I+have+completed+steps"))
+            markup.add(types.InlineKeyboardButton(
+                "📩 Claim your code",
+                url="https://wa.me/918902250545?text=Hi,+I+have+completed+steps"
+            ))
             bot.send_message(cid, "✅ Bank saved. Click below:", reply_markup=markup)
         else:
             bot.send_message(cid, "❌ Invalid format. Use: A/C, IFSC, Bank")
@@ -79,7 +82,11 @@ def handle(m):
             user_data.setdefault(cid, {})['balance'] = credited_amount
             user_data[cid]['referrals'] = user_data[cid].get('referrals', 0)
             bot.send_message(cid, f"🎉 ₹{credited_amount} successfully credited to your wallet!")
-            bot.send_message(cid, f"🔗 Your referral link:\nhttps://t.me/Task_Youtube_Bot?start={cid}")
+            bot.send_message(
+                cid,
+                f"🔗 Your referral link:\nhttps://t.me/Task_Youtube_Bot?start={cid}\n\n🧑 1 referral is *mandatory* for withdrawal.",
+                parse_mode='Markdown'
+            )
             kb = types.ReplyKeyboardMarkup(resize_keyboard=True)
             kb.add("💼 Withdraw")
             bot.send_message(cid, "👇 Tap below to withdraw your salary:", reply_markup=kb)
